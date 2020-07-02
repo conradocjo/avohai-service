@@ -30,17 +30,17 @@ public class GrandParent implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandfather")
-	private List<Person> grandFather;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandFather")
+	private List<Person> grandFatherList;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandmother")
-	private List<Person> grandMother;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandMother")
+	private List<Person> grandMotherList;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greatergrandfather")
-	private List<Person> greaterGrandFather;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greaterGrandFather")
+	private List<Person> greaterGrandFatherList;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greatergrandmother")
-	private List<Person> greaterGrandMother;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greaterGrandMother")
+	private List<Person> greaterGrandMotherList;
 
 	@Column(name = "paternalMaternal", length = 8)
 	@Enumerated(EnumType.STRING)

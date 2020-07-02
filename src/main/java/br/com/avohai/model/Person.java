@@ -30,7 +30,7 @@ public class Person implements Serializable {
 	private String name;
 
 	@ManyToOne
-	@JoinColumn(name = "grandfather")
+	@JoinColumn(name = "grandFather")
 	private GrandParent grandFather;
 
 	@ManyToOne
