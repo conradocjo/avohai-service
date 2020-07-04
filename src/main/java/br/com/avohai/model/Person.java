@@ -11,14 +11,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @Entity
 @Table(name = "Person")
-public class Person implements Serializable {
+public class Person extends BaseModel implements Serializable {
 
 	private static final long serialVersionUID = 7884101404453275960L;
 
@@ -44,4 +46,13 @@ public class Person implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "greaterGrandMother")
 	private GrandParent greaterGrandMother;
+
+	public Person() {
+
+	}
+
+	public Person(String name, GrandParent grandFather, GrandParent grandMother, GrandParent greaterGrandFather,
+			GrandParent greaterGrandMother) {
+
+	}
 }

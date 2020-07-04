@@ -20,5 +20,5 @@ public class DadosDoUsuario implements Serializable {
 	private String maternalGrandMotherName;
 	private String nomePai;
 	private String nomeMae;
-
+	
 }

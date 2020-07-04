@@ -10,14 +10,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 @Entity
 @Table(name = "Parent")
-public class Parent implements Serializable {
+public class Parent extends BaseModel implements Serializable {
 
 	private static final long serialVersionUID = 5784322308423497051L;
 
@@ -32,5 +34,14 @@ public class Parent implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "mother")
 	private Person mother;
+
+	public Parent() {
+
+	}
+
+	public Parent(Person father, Person mother) {
+		this.father = father;
+		this.mother = mother;
+	}
 
 }

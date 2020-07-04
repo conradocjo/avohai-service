@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "User")
-public class User implements Serializable {
+public class User extends BaseModel implements Serializable {
 
 	private static final long serialVersionUID = -3220628448333591545L;
 
@@ -31,4 +31,11 @@ public class User implements Serializable {
 	@JoinColumn(name = "person")
 	private Person person;
 
+	public User() {
+
+	}
+
+	public User(Person person) {
+		this.person = person;
+	}
 }
