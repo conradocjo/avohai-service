@@ -2,9 +2,7 @@ package br.com.avohai.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,10 +10,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import br.com.avohai.model.enumerators.PaternalMaternalEnum;
 import lombok.AllArgsConstructor;
@@ -35,33 +32,38 @@ public class GrandParent extends BaseModel implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandFather")
-	private List<Person> grandFatherList;
+	@Column(name = "greaterGrandFatherName", nullable = false)
+	private String greaterGrandFatherName;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "grandMother")
-	private List<Person> grandMotherList;
+	@Column(name = "greaterGrandMotherName", nullable = false)
+	private String greaterGrandMotherName;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greaterGrandFather")
-	private List<Person> greaterGrandFatherList;
+	@Column(name = "grandFatherName", nullable = false)
+	private String grandFatherName;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "greaterGrandMother")
-	private List<Person> greaterGrandMotherList;
+	@Column(name = "grandMotherName", nullable = false)
+	private String grandMotherName;
 
 	@Column(name = "paternalMaternal", length = 8)
 	@Enumerated(EnumType.STRING)
 	private PaternalMaternalEnum paternalMaternalEnum;
 
-	public GrandParent() {
+	@ManyToOne
+	@JoinColumn(name = "userId")
+	private User user;
 
+	public GrandParent(String greaterGrandFatherName, String greaterGrandMotherName, String grandFatherName,
+			String grandMotherName, PaternalMaternalEnum paternalMaternalEnum, Date dataCadastro) {
+		this.greaterGrandFatherName = greaterGrandFatherName;
+		this.greaterGrandMotherName = greaterGrandMotherName;
+		this.grandFatherName = grandFatherName;
+		this.grandMotherName = grandMotherName;
+		this.paternalMaternalEnum = paternalMaternalEnum;
+		this.setDataHoraGravacao(dataCadastro);
 	}
 
-	public GrandParent(List<Person> grandFatherList, List<Person> grandMotherList, List<Person> greaterGrandFatherList,
-			List<Person> greaterGrandMotherList, PaternalMaternalEnum paternalMaternalEnum) {
-		this.grandFatherList = grandFatherList;
-		this.grandMotherList = grandMotherList;
-		this.greaterGrandFatherList = greaterGrandFatherList;
-		this.greaterGrandMotherList = greaterGrandMotherList;
-		this.paternalMaternalEnum = paternalMaternalEnum;
+	public GrandParent() {
+
 	}
 
 }

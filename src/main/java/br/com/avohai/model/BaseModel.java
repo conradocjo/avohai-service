@@ -7,7 +7,12 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @MappedSuperclass
+@Getter
+@Setter
 public class BaseModel {
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -17,5 +22,6 @@ public class BaseModel {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "dataHoraEdicao", nullable = true)
 	private Date dataHoraEdicao;
+
 
 }
