@@ -3,6 +3,7 @@ package br.com.avohai.resources;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +23,8 @@ public class TreeResources {
 	private TreeService treeService;
 
 	@PostMapping
-	public boolean salvarDadosDoUsuario(@Valid @RequestBody DadosDoUsuario dadosDoUsuario) {
-		return this.treeService.preparaDadosParaSeremGravados(dadosDoUsuario);
+	public ResponseEntity<Boolean> salvarDadosDoUsuario(@Valid @RequestBody DadosDoUsuario dadosDoUsuario) {
+		return ResponseEntity.ok().body(this.treeService.preparaDadosParaSeremGravados(dadosDoUsuario));
 	}
 
 	@GetMapping(value = "/teste")

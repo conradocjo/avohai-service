@@ -6,4 +6,6 @@ public interface TreeService {
 
 	boolean preparaDadosParaSeremGravados(DadosDoUsuario dadosDoUsuario);
 
+	DadosDoUsuario buscarUsuarioCompletoPorCpf(String cpf);
+
 }

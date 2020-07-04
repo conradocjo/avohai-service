@@ -1,11 +1,16 @@
 package br.com.avohai.services.impl;
 
+import static br.com.avohai.model.dto.DadosDoUsuario.preencherDadosDoUsuario;
+
 import java.util.Arrays;
 import java.util.Date;
+
+import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.avohai.dao.GenericDao;
 import br.com.avohai.model.GrandParent;
 import br.com.avohai.model.Parent;
 import br.com.avohai.model.User;
@@ -18,7 +23,7 @@ import br.com.avohai.services.TreeService;
 import lombok.Getter;
 
 @Service
-public class TreeServiceImpl implements TreeService {
+public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 
 	@Autowired
 	@Getter
@@ -31,6 +36,22 @@ public class TreeServiceImpl implements TreeService {
 	@Autowired
 	@Getter
 	private GrandParentsRepository grandParentRepository;
+
+	@Override
+	public DadosDoUsuario buscarUsuarioCompletoPorCpf(String cpf) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT u FROM User u ");
+		sql.append(" INNER JOIN u.parent parents ");
+		sql.append(" INNER JOIN FETCH u.grandParents grandParents ");
+		sql.append(" WHERE u.cpf = :parameterCpf ");
+
+		TypedQuery<User> query = getEntityManager().createQuery(sql.toString(), User.class);
+		query.setParameter("parameterCpf", cpf);
+
+		User user = query.getSingleResult();
+
+		return user != null ? preencherDadosDoUsuario(user) : new DadosDoUsuario();
+	}
 
 	@Override
 	public boolean preparaDadosParaSeremGravados(DadosDoUsuario dadosDoUsuario) {

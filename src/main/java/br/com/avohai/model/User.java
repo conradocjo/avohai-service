@@ -15,6 +15,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +44,7 @@ public class User extends BaseModel implements Serializable {
 	@JoinColumn(name = "parent")
 	private Parent parent;
 
+	@JsonIgnore
 	@ManyToMany(cascade = CascadeType.ALL, mappedBy = "user")
 	private List<GrandParent> grandParents;
 
