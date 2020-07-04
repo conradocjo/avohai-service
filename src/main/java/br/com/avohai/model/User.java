@@ -35,6 +35,9 @@ public class User extends BaseModel implements Serializable {
 	@Column(name = "name", nullable = false)
 	private String name;
 
+	@Column(name = "cpf", nullable = false, length = 14)
+	private String cpf;
+
 	@ManyToOne
 	@JoinColumn(name = "parent")
 	private Parent parent;
@@ -46,8 +49,9 @@ public class User extends BaseModel implements Serializable {
 
 	}
 
-	public User(String name, Parent parent, List<GrandParent> grandParents, Date dataCadastro) {
+	public User(String name, String cpf, Parent parent, List<GrandParent> grandParents, Date dataCadastro) {
 		this.setName(name);
+		this.cpf = cpf;
 		this.grandParents = grandParents;
 		this.parent = parent;
 		this.setDataHoraGravacao(dataCadastro);

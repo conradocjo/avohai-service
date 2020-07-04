@@ -10,6 +10,7 @@ public class DadosDoUsuario implements Serializable {
 	private static final long serialVersionUID = 7884151599663592506L;
 
 	private String nomeUsuario;
+	private String cpf;
 	private String paternalGreaterGrandFatherName;
 	private String maternalGreaterGrandFatherName;
 	private String paternalGreaterGrandMotherName;

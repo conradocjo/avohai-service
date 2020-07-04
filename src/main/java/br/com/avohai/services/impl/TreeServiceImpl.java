@@ -47,7 +47,7 @@ public class TreeServiceImpl implements TreeService {
 
 		Parent parent = new Parent(dadosDoUsuario.getNomePai(), dadosDoUsuario.getNomeMae(), dataDoCadastro);
 
-		User user = new User(dadosDoUsuario.getNomeUsuario(), parent,
+		User user = new User(dadosDoUsuario.getNomeUsuario(), dadosDoUsuario.getCpf(), parent,
 				Arrays.asList(paternalGrandParent, maternalGrandParent), dataDoCadastro);
 
 		paternalGrandParent.setUser(user);
