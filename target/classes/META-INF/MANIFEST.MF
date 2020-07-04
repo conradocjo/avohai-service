@@ -1,7 +1,10 @@
 Manifest-Version: 1.0
-Build-Jdk-Spec: 11
+Built-By: conrado
+Build-Jdk: 11.0.7
 Implementation-Title: avohai-service
 Implementation-Version: 0.0.1-SNAPSHOT
-Implementation-Vendor: Pivotal Software, Inc.
+Implementation-Vendor-Id: com.example
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/avohai-service
 Created-By: Maven Integration for Eclipse
 

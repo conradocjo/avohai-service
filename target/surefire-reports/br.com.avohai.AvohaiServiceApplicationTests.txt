@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: br.com.avohai.AvohaiServiceApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.629 s - in br.com.avohai.AvohaiServiceApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.344 s - in br.com.avohai.AvohaiServiceApplicationTests
