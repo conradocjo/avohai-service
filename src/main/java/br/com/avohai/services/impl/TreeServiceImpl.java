@@ -38,22 +38,20 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 	@Getter
 	private GrandParentsRepository grandParentRepository;
 
-	@Override
-	public DadosDoUsuario buscarUsuarioCompletoPorCpf(String cpf) {
-		StringBuilder sql = new StringBuilder();
-		sql.append(" SELECT u FROM User u ");
-		sql.append(" INNER JOIN u.parent parents ");
-		sql.append(" INNER JOIN FETCH u.grandParents grandParents ");
-		sql.append(" WHERE u.cpf = :parameterCpf ");
-
-		TypedQuery<User> query = getEntityManager().createQuery(sql.toString(), User.class);
-		query.setParameter("parameterCpf", cpf);
-
-		User user = query.getSingleResult();
-
-		return user != null ? preencherDadosDoUsuario(user) : new DadosDoUsuario();
+	/**
+	 * O método abaixo valida se o registro que será gravado é um novo registro ou
+	 * uma edição.
+	 */
+	public Boolean verificaSeRegistroEhNovo(DadosDoUsuario dadosDoUsuario) {
+		return dadosDoUsuario.getIdUser() == null ? true : false;
 	}
 
+	/**
+	 * O método preparaDadosParaSeremGravados é acionado pelos serviços de gravação
+	 * de novo registro e atualização, para evitar de escrever um mesmo código duas
+	 * vezes, visto que as informações do DTO são convertidas em informações válidas
+	 * para as tabelas existentes.
+	 */
 	@Override
 	public boolean preparaDadosParaSeremGravados(DadosDoUsuario dadosDoUsuario) {
 		boolean retorno = false;
@@ -75,7 +73,11 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		paternalGrandParent.setUser(user);
 		maternalGrandParent.setUser(user);
 		try {
-			realizarPersistenciaDosDados(paternalGrandParent, maternalGrandParent, parent, user);
+			if (verificaSeRegistroEhNovo(dadosDoUsuario)) {
+				verificaSeRegistroJaExiste(paternalGrandParent, maternalGrandParent, parent, user);
+			} else {
+				// Fazer método para realizar atualização dos dados.
+			}
 			retorno = true;
 		} catch (Exception e) {
 			retorno = false;
@@ -84,7 +86,12 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		return retorno;
 	}
 
-	private void realizarPersistenciaDosDados(GrandParent paternalGrandParent, GrandParent maternalGrandParent,
+	/**
+	 * Antes de acionar o método para gravar o registro, o método
+	 * verificaSeRegistroJaExiste, verifica a existencia dos registros, Para não
+	 * gerar um regitro duplicado.
+	 */
+	private void verificaSeRegistroJaExiste(GrandParent paternalGrandParent, GrandParent maternalGrandParent,
 			Parent parent, User user) throws Exception {
 		try {
 			User usuarioExistente = this.userRepository.findUserByCpf(user.getCpf());
@@ -100,7 +107,7 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 					maternalGrandParent.getGrandFatherName().concat("%"),
 					maternalGrandParent.getGrandMotherName().concat("%"), PaternalMaternalEnum.MATERNAL);
 
-			gravar(paternalGrandParent, maternalGrandParent, parent, user, usuarioExistente, parentExistente,
+			gravarRegistro(paternalGrandParent, maternalGrandParent, parent, user, usuarioExistente, parentExistente,
 					paternalGrandParentExistente, maternalGrandParentExistente);
 
 		} catch (Exception e) {
@@ -108,8 +115,8 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		}
 	}
 
-	private void gravar(GrandParent paternalGrandParent, GrandParent maternalGrandParent, Parent parent, User user,
-			User usuarioExistente, Parent parentExistente, GrandParent paternalGrandParentExistente,
+	private void gravarRegistro(GrandParent paternalGrandParent, GrandParent maternalGrandParent, Parent parent,
+			User user, User usuarioExistente, Parent parentExistente, GrandParent paternalGrandParentExistente,
 			GrandParent maternalGrandParentExistente) {
 		if (nonNull(parentExistente)) {
 			parentsRepository.save(parentExistente);
@@ -124,11 +131,26 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		}
 
 		if (nonNull(paternalGrandParentExistente) && nonNull(maternalGrandParentExistente)) {
-			grandParentRepository
-					.saveAll(Arrays.asList(paternalGrandParentExistente, maternalGrandParentExistente));
+			grandParentRepository.saveAll(Arrays.asList(paternalGrandParentExistente, maternalGrandParentExistente));
 		} else {
 			grandParentRepository.saveAll(Arrays.asList(maternalGrandParent, paternalGrandParent));
 		}
+	}
+
+	@Override
+	public DadosDoUsuario buscarUsuarioCompletoPorCpf(String cpf) {
+		StringBuilder sql = new StringBuilder();
+		sql.append(" SELECT u FROM User u ");
+		sql.append(" INNER JOIN u.parent parents ");
+		sql.append(" INNER JOIN FETCH u.grandParents grandParents ");
+		sql.append(" WHERE u.cpf = :parameterCpf ");
+
+		TypedQuery<User> query = getEntityManager().createQuery(sql.toString(), User.class);
+		query.setParameter("parameterCpf", cpf);
+
+		User user = query.getSingleResult();
+
+		return user != null ? preencherDadosDoUsuario(user) : new DadosDoUsuario();
 	}
 
 }

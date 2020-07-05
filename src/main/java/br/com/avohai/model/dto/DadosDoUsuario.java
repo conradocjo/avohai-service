@@ -23,6 +23,10 @@ public class DadosDoUsuario implements Serializable {
 	private String maternalGrandMotherName;
 	private String nomePai;
 	private String nomeMae;
+	private Long idParent;
+	private Long idPaternalGrandParent;
+	private Long idMaternalGrandParent;
+	private Long idUser;
 
 	public static DadosDoUsuario preencherDadosDoUsuario(User user) {
 		DadosDoUsuario dadosDoUsuario = new DadosDoUsuario();
@@ -31,19 +35,23 @@ public class DadosDoUsuario implements Serializable {
 		} else {
 			dadosDoUsuario.setNomeUsuario(user.getName());
 			dadosDoUsuario.setCpf(user.getCpf());
-
+			dadosDoUsuario.setIdUser(user.getId());
+			dadosDoUsuario.setIdParent(user.getParent().getId());
 			user.getGrandParents().forEach(grandParents -> {
 				if (grandParents.getPaternalMaternalEnum().equals(PaternalMaternalEnum.PATERNAL)) {
 					dadosDoUsuario.setPaternalGreaterGrandFatherName(grandParents.getGreaterGrandFatherName());
 					dadosDoUsuario.setPaternalGreaterGrandMotherName(grandParents.getGreaterGrandMotherName());
 					dadosDoUsuario.setPaternalGrandFatherName(grandParents.getGrandFatherName());
 					dadosDoUsuario.setPaternalGrandMotherName(grandParents.getGrandMotherName());
+					dadosDoUsuario.setIdPaternalGrandParent(grandParents.getId());
 				} else {
 					dadosDoUsuario.setMaternalGreaterGrandFatherName(grandParents.getGreaterGrandFatherName());
 					dadosDoUsuario.setMaternalGreaterGrandMotherName(grandParents.getGreaterGrandMotherName());
 					dadosDoUsuario.setMaternalGrandFatherName(grandParents.getGrandFatherName());
 					dadosDoUsuario.setMaternalGrandMotherName(grandParents.getGrandMotherName());
+					dadosDoUsuario.setIdMaternalGrandParent(grandParents.getId());
 				}
+				
 			});
 
 			dadosDoUsuario.setNomePai(user.getParent().getFather());
