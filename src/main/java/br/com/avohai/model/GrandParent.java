@@ -1,7 +1,6 @@
 package br.com.avohai.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -53,13 +52,12 @@ public class GrandParent extends BaseModel implements Serializable {
 	private User user;
 
 	public GrandParent(String greaterGrandFatherName, String greaterGrandMotherName, String grandFatherName,
-			String grandMotherName, PaternalMaternalEnum paternalMaternalEnum, Date dataCadastro) {
+			String grandMotherName, PaternalMaternalEnum paternalMaternalEnum) {
 		this.greaterGrandFatherName = greaterGrandFatherName;
 		this.greaterGrandMotherName = greaterGrandMotherName;
 		this.grandFatherName = grandFatherName;
 		this.grandMotherName = grandMotherName;
 		this.paternalMaternalEnum = paternalMaternalEnum;
-		this.setDataHoraGravacao(dataCadastro);
 	}
 
 	public GrandParent() {

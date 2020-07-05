@@ -1,7 +1,6 @@
 package br.com.avohai.model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -52,12 +51,11 @@ public class User extends BaseModel implements Serializable {
 
 	}
 
-	public User(String name, String cpf, Parent parent, List<GrandParent> grandParents, Date dataCadastro) {
+	public User(String name, String cpf, Parent parent, List<GrandParent> grandParents) {
 		this.setName(name);
 		this.cpf = cpf;
 		this.grandParents = grandParents;
 		this.parent = parent;
-		this.setDataHoraGravacao(dataCadastro);
 	}
 
 }

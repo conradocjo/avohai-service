@@ -1,7 +1,6 @@
 package br.com.avohai.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,10 +36,9 @@ public class Parent extends BaseModel implements Serializable {
 
 	}
 
-	public Parent(String father, String mother, Date dataCadastro) {
+	public Parent(String father, String mother) {
 		this.father = father;
 		this.mother = mother;
-		this.setDataHoraGravacao(dataCadastro);
 	}
 
 }

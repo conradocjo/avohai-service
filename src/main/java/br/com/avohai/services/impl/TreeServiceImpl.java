@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.TypedQuery;
 
@@ -55,28 +56,27 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 	@Override
 	public boolean preparaDadosParaSeremGravados(DadosDoUsuario dadosDoUsuario) {
 		boolean retorno = false;
-		Date dataDoCadastro = new Date();
 
 		GrandParent paternalGrandParent = new GrandParent(dadosDoUsuario.getPaternalGreaterGrandFatherName(),
 				dadosDoUsuario.getPaternalGreaterGrandMotherName(), dadosDoUsuario.getPaternalGrandFatherName(),
-				dadosDoUsuario.getPaternalGrandMotherName(), PaternalMaternalEnum.PATERNAL, dataDoCadastro);
+				dadosDoUsuario.getPaternalGrandMotherName(), PaternalMaternalEnum.PATERNAL);
 
 		GrandParent maternalGrandParent = new GrandParent(dadosDoUsuario.getMaternalGreaterGrandFatherName(),
 				dadosDoUsuario.getMaternalGreaterGrandMotherName(), dadosDoUsuario.getMaternalGrandFatherName(),
-				dadosDoUsuario.getMaternalGrandMotherName(), PaternalMaternalEnum.MATERNAL, dataDoCadastro);
+				dadosDoUsuario.getMaternalGrandMotherName(), PaternalMaternalEnum.MATERNAL);
 
-		Parent parent = new Parent(dadosDoUsuario.getNomePai(), dadosDoUsuario.getNomeMae(), dataDoCadastro);
+		Parent parent = new Parent(dadosDoUsuario.getNomePai(), dadosDoUsuario.getNomeMae());
 
 		User user = new User(dadosDoUsuario.getNomeUsuario(), dadosDoUsuario.getCpf(), parent,
-				Arrays.asList(paternalGrandParent, maternalGrandParent), dataDoCadastro);
+				Arrays.asList(paternalGrandParent, maternalGrandParent));
 
 		paternalGrandParent.setUser(user);
 		maternalGrandParent.setUser(user);
 		try {
 			if (verificaSeRegistroEhNovo(dadosDoUsuario)) {
-				verificaSeRegistroJaExiste(paternalGrandParent, maternalGrandParent, parent, user);
+				realizaValidacoesEhContinuaProcessoParaGravacao(paternalGrandParent, maternalGrandParent, parent, user);
 			} else {
-				// Fazer método para realizar atualização dos dados.
+				realizarEdicao(dadosDoUsuario);
 			}
 			retorno = true;
 		} catch (Exception e) {
@@ -86,13 +86,63 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		return retorno;
 	}
 
+	private void realizarEdicao(DadosDoUsuario dadosDoUsuario) {
+
+		Optional<User> recoveredUser = userRepository.findById(dadosDoUsuario.getIdUser());
+		Optional<Parent> recoveredParent = parentsRepository.findById(dadosDoUsuario.getIdParent());
+		Optional<GrandParent> recoveredPaternalGrandParent = grandParentRepository
+				.findById(dadosDoUsuario.getIdPaternalGrandParent());
+		Optional<GrandParent> recoveredMaternalGrandParent = grandParentRepository
+				.findById(dadosDoUsuario.getIdMaternalGrandParent());
+		preencheHoraEdicao(recoveredUser, recoveredParent, recoveredPaternalGrandParent, recoveredMaternalGrandParent);
+		preencheParents(dadosDoUsuario, recoveredParent);
+		preencheGrandParents(dadosDoUsuario, recoveredPaternalGrandParent, recoveredMaternalGrandParent);
+
+		parentsRepository.save(recoveredParent.get());
+
+		userRepository.save(recoveredUser.get());
+
+		grandParentRepository.saveAll(Arrays.asList(recoveredPaternalGrandParent.get(), recoveredMaternalGrandParent.get()));
+	}
+
+	private void preencheGrandParents(DadosDoUsuario dadosDoUsuario, Optional<GrandParent> recoveredPaternalGrandParent,
+			Optional<GrandParent> recoveredMaternalGrandParent) {
+		recoveredPaternalGrandParent.get().setGrandFatherName(dadosDoUsuario.getPaternalGrandFatherName());
+		recoveredPaternalGrandParent.get().setGrandMotherName(dadosDoUsuario.getPaternalGrandMotherName());
+		recoveredMaternalGrandParent.get().setGrandFatherName(dadosDoUsuario.getMaternalGrandFatherName());
+		recoveredMaternalGrandParent.get().setGrandMotherName(dadosDoUsuario.getMaternalGrandMotherName());
+
+		recoveredPaternalGrandParent.get()
+				.setGreaterGrandFatherName(dadosDoUsuario.getPaternalGreaterGrandFatherName());
+		recoveredPaternalGrandParent.get()
+				.setGreaterGrandMotherName(dadosDoUsuario.getPaternalGreaterGrandMotherName());
+		recoveredMaternalGrandParent.get()
+				.setGreaterGrandFatherName(dadosDoUsuario.getMaternalGreaterGrandFatherName());
+		recoveredMaternalGrandParent.get()
+				.setGreaterGrandMotherName(dadosDoUsuario.getMaternalGreaterGrandMotherName());
+	}
+
+	private void preencheParents(DadosDoUsuario dadosDoUsuario, Optional<Parent> recoveredParent) {
+		recoveredParent.get().setFather(dadosDoUsuario.getNomePai());
+		recoveredParent.get().setMother(dadosDoUsuario.getNomeMae());
+	}
+
+	private void preencheHoraEdicao(Optional<User> recoveredUser, Optional<Parent> recoveredParent,
+			Optional<GrandParent> recoveredPaternalGrandParent, Optional<GrandParent> recoveredMaternalGrandParent) {
+		Date dataDaEdicao = new Date();
+		recoveredUser.get().setDataHoraEdicao(dataDaEdicao);
+		recoveredParent.get().setDataHoraEdicao(dataDaEdicao);
+		recoveredPaternalGrandParent.get().setDataHoraEdicao(dataDaEdicao);
+		recoveredMaternalGrandParent.get().setDataHoraEdicao(dataDaEdicao);
+	}
+
 	/**
 	 * Antes de acionar o método para gravar o registro, o método
 	 * verificaSeRegistroJaExiste, verifica a existencia dos registros, Para não
 	 * gerar um regitro duplicado.
 	 */
-	private void verificaSeRegistroJaExiste(GrandParent paternalGrandParent, GrandParent maternalGrandParent,
-			Parent parent, User user) throws Exception {
+	private void realizaValidacoesEhContinuaProcessoParaGravacao(GrandParent paternalGrandParent,
+			GrandParent maternalGrandParent, Parent parent, User user) throws Exception {
 		try {
 			User usuarioExistente = this.userRepository.findUserByCpf(user.getCpf());
 
@@ -118,6 +168,9 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 	private void gravarRegistro(GrandParent paternalGrandParent, GrandParent maternalGrandParent, Parent parent,
 			User user, User usuarioExistente, Parent parentExistente, GrandParent paternalGrandParentExistente,
 			GrandParent maternalGrandParentExistente) {
+
+		preencheDataDeGravacao(paternalGrandParent, maternalGrandParent, parent, user);
+
 		if (nonNull(parentExistente)) {
 			parentsRepository.save(parentExistente);
 		} else {
@@ -135,6 +188,15 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 		} else {
 			grandParentRepository.saveAll(Arrays.asList(maternalGrandParent, paternalGrandParent));
 		}
+	}
+
+	private void preencheDataDeGravacao(GrandParent paternalGrandParent, GrandParent maternalGrandParent, Parent parent,
+			User user) {
+		Date dataDoCadastro = new Date();
+		parent.setDataHoraGravacao(dataDoCadastro);
+		user.setDataHoraGravacao(dataDoCadastro);
+		maternalGrandParent.setDataHoraGravacao(dataDoCadastro);
+		paternalGrandParent.setDataHoraGravacao(dataDoCadastro);
 	}
 
 	@Override

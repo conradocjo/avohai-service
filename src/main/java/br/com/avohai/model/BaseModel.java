@@ -23,5 +23,4 @@ public class BaseModel {
 	@Column(name = "dataHoraEdicao", nullable = true)
 	private Date dataHoraEdicao;
 
-
 }
