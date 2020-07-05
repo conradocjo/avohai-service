@@ -1,6 +1,7 @@
 package br.com.avohai.services.impl;
 
 import static br.com.avohai.model.dto.DadosDoUsuario.preencherDadosDoUsuario;
+import static java.util.Objects.nonNull;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -86,11 +87,47 @@ public class TreeServiceImpl extends GenericDao<User> implements TreeService {
 	private void realizarPersistenciaDosDados(GrandParent paternalGrandParent, GrandParent maternalGrandParent,
 			Parent parent, User user) throws Exception {
 		try {
-			parentsRepository.save(parent);
-			user = userRepository.save(user);
-			grandParentRepository.saveAll(Arrays.asList(maternalGrandParent, paternalGrandParent));
+			User usuarioExistente = this.userRepository.findUserByCpf(user.getCpf());
+
+			Parent parentExistente = this.parentsRepository.findParentByPartName(parent.getFather().concat("%"),
+					parent.getMother().concat("%"));
+
+			GrandParent paternalGrandParentExistente = this.grandParentRepository.findGrandParentByPartName(
+					paternalGrandParent.getGrandFatherName().concat("%"),
+					paternalGrandParent.getGrandMotherName().concat("%"), PaternalMaternalEnum.PATERNAL);
+
+			GrandParent maternalGrandParentExistente = this.grandParentRepository.findGrandParentByPartName(
+					maternalGrandParent.getGrandFatherName().concat("%"),
+					maternalGrandParent.getGrandMotherName().concat("%"), PaternalMaternalEnum.MATERNAL);
+
+			gravar(paternalGrandParent, maternalGrandParent, parent, user, usuarioExistente, parentExistente,
+					paternalGrandParentExistente, maternalGrandParentExistente);
+
 		} catch (Exception e) {
 			throw new Exception();
+		}
+	}
+
+	private void gravar(GrandParent paternalGrandParent, GrandParent maternalGrandParent, Parent parent, User user,
+			User usuarioExistente, Parent parentExistente, GrandParent paternalGrandParentExistente,
+			GrandParent maternalGrandParentExistente) {
+		if (nonNull(parentExistente)) {
+			parentsRepository.save(parentExistente);
+		} else {
+			parentsRepository.save(parent);
+		}
+
+		if (nonNull(usuarioExistente)) {
+			user = userRepository.save(usuarioExistente);
+		} else {
+			user = userRepository.save(user);
+		}
+
+		if (nonNull(paternalGrandParentExistente) && nonNull(maternalGrandParentExistente)) {
+			grandParentRepository
+					.saveAll(Arrays.asList(paternalGrandParentExistente, maternalGrandParentExistente));
+		} else {
+			grandParentRepository.saveAll(Arrays.asList(maternalGrandParent, paternalGrandParent));
 		}
 	}
 
